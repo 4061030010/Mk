@@ -3,70 +3,178 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    
     <title>הכפר הקטן - דף הבית</title>
-    <meta name="description" content="ברוכים הבאים לאתר הכפר הקטן. כאן תוכלו למצוא מידע וליצור איתנו קשר בקלות.">
-    <meta name="keywords" content="הכפר הקטן, כפר, קטן, יצירת קשר">
-    <meta property="og:title" content="הכפר הקטן">
-    <meta property="og:image" content="https://mk-xi-nine.vercel.app/og-image.png">
+    
+    <meta name="description" content="ברוכים הבאים לאתר הכפר הקטן - איכות, שירות וקהילה במקום אחד.">
+    <meta name="keywords" content="הכפר הקטן, חנות, הזמנות, כפר">
 
     <style>
+        :root {
+            --primary-color: #27ae60;
+            --secondary-color: #2ecc71;
+            --dark-blue: #2c3e50;
+            --light-bg: #f4f7f6;
+            --white: #ffffff;
+        }
+
+        * { box-sizing: border-box; }
+
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            text-align: center;
-            background-color: #f4f7f6;
+            background-color: var(--light-bg);
             margin: 0;
             padding: 0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
+            color: var(--dark-blue);
+            line-height: 1.6;
         }
+
+        header {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: var(--white);
+            padding: 40px 20px;
+            text-align: center;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            border-bottom-left-radius: 30px;
+            border-bottom-right-radius: 30px;
+        }
+
+        header h1 {
+            margin: 0;
+            font-size: 3rem;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+        }
+
+        header p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            margin-top: 10px;
+        }
+
         .container {
-            background: white;
-            padding: 40px;
+            max-width: 900px;
+            margin: -30px auto 40px;
+            padding: 0 20px;
+        }
+
+        .card {
+            background: var(--white);
             border-radius: 20px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
-            max-width: 400px;
-            width: 90%;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+            margin-bottom: 25px;
         }
-        h1 {
-            color: #2c3e50;
-            margin-bottom: 10px;
-            font-size: 2.5em;
+
+        h2 {
+            color: var(--primary-color);
+            border-right: 5px solid var(--primary-color);
+            padding-right: 15px;
+            margin-bottom: 25px;
         }
-        p {
-            color: #7f8c8d;
-            font-size: 1.1em;
-            margin-bottom: 30px;
+
+        /* עיצוב רשימת המוצרים */
+        .product-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 15px;
         }
-        .btn {
-            display: inline-block;
-            padding: 15px 30px;
-            background-color: #25D366; /* צבע וואטסאפ */
-            color: white;
-            text-decoration: none;
-            border-radius: 50px;
+
+        .product-card {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 20px;
+            background: #fff;
+            border: 1px solid #eee;
+            border-radius: 12px;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .product-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+            border-color: var(--secondary-color);
+        }
+
+        .product-name {
             font-weight: bold;
-            transition: transform 0.3s ease;
-            box-shadow: 0 4px 15px rgba(37, 211, 102, 0.3);
+            font-size: 1.1rem;
         }
-        .btn:hover {
-            transform: scale(1.05);
+
+        .product-price {
+            background: var(--primary-color);
+            color: white;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-weight: bold;
+        }
+
+        /* אזור יצירת קשר */
+        .contact-box {
+            text-align: center;
+            background: var(--dark-blue);
+            color: white;
+            border-radius: 20px;
+            padding: 40px;
+            margin-top: 40px;
+        }
+
+        .whatsapp-btn {
+            display: inline-flex;
+            align-items: center;
+            background-color: #25D366;
+            color: white;
+            padding: 18px 35px;
+            border-radius: 50px;
+            text-decoration: none;
+            font-size: 1.3rem;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            margin-top: 20px;
+            box-shadow: 0 10px 20px rgba(37, 211, 102, 0.3);
+        }
+
+        .whatsapp-btn:hover {
             background-color: #128C7E;
+            transform: scale(1.05);
+            box-shadow: 0 15px 25px rgba(37, 211, 102, 0.4);
+        }
+
+        footer {
+            text-align: center;
+            padding: 30px;
+            color: #888;
+            font-size: 0.9rem;
+        }
+
+        /* אנימציית כניסה */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .card { animation: fadeIn 0.8s ease-out; }
+
+        /* התאמה לטלפונים */
+        @media (max-width: 600px) {
+            header h1 { font-size: 2.2rem; }
+            .container { margin-top: -20px; }
         }
     </style>
 </head>
 <body>
 
-    <div class="container">
+    <header>
         <h1>הכפר הקטן</h1>
-        <p>נשמח לעמוד לשירותכם לכל שאלה!</p>
-        
-        <a href="https://wa.me/972584770231" target="_blank" class="btn">
-            דברו איתנו בוואטסאפ
-        </a>
-    </div>
+        <p>איכות ושירות מהלב של הקהילה</p>
+    </header>
 
-</body>
-</html>
+    <div class="container">
+        <div class="card">
+            <h2>המוצרים שלנו</h2>
+            <div class="product-grid">
+                <div class="product-card">
+                    <span class="product-name">לחם כפרי עבודת יד</span>
+                    <span class="product-price">₪18</span>
+                </div>
+                <div class="product-card">
+                    <span class="product-name">ש
