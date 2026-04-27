@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <title>הכפר בקטן</title>
+    <style>
+        body { font-family: system-ui, -apple-system, sans-serif; -webkit-tap-highlight-color: transparent; overflow-x: hidden; }
+        .page { display: none; padding-top: 10px; min-height: 100vh; }
+        .page.active { display: block; }
+        .content-buffer { padding-bottom: 300px !important; }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        .category-btn.active { background-color: #15803d; color: white; }
+        @keyframes pulse-soft { 0% { transform: scale(1); } 50% { transform: scale(1.05); } 100% { transform: scale(1); } }
+        .contact-btn { animation: pulse-soft 3s infinite ease-in-out; }
+    </style>
+</head>
+<body class="bg-gray-50 text-right">
+
+    <header class="bg-white shadow-sm p-4 sticky top-0 z-[60] flex justify-between items-center border-b border-gray-100">
+        <div class="text-2xl font-black text-green-700 italic tracking-tighter cursor-pointer" onclick="checkAdmin()">הכפר בקטן</div>
+        <div class="flex items-center gap-2">
+            <div id="admin-badge" class="hidden bg-red-100 text-red-600 text-[10px] px-2 py-1 rounded font-bold italic">מנהל על</div>
+            <button id="logout-admin-btn" onclick="logoutAdmin()" class="hidden bg-red-500 text-white text-[10px] px-3 py-1 rounded-full font-bold shadow-sm">יציאה</button>
+        </div>
+    </header>
+
+    <div id="home" class="page active content-buffer">
+        <div class="bg-white border-b border-gray-100 sticky top-[65px] z-40">
+            <div id="category-bar" class="flex overflow-x-auto py-4 px-4 gap-3 no-scrollbar">
+                <button onclick="filterAds('הכל')" class="category-btn active flex-shrink-0 bg-gray-100 text-gray-600 px-4 py-2 rounded-full text-xs font-bold transition">הכל</button>
+            </div>
+        </div>
+
+        <section class="p-6 bg-green-700 text-white rounded-b-[40px] shadow-lg mb-6">
+            <h1 class="text-2xl font-bold mb-1 italic">הלוח של הכפר</h1>
+            <p class="text-sm opacity-90 italic">הכל קרוב, הכל בקטן</p>
+        </section>
+
+        <section class="px-6" id="ads-container">
+            <div class="text-center py-10 text-gray-400 italic">טוען מודעות...</div>
+        </section>
+
+        <div class="fixed bottom-28 left-6 right-6 z-50">
+            <button onclick="prepareNewAd()" class="w-full bg-blue-600 text-white font-extrabold py-4 rounded-2xl shadow-2xl flex justify-center items-center gap-2 border-2 border-white transform active:scale-95 transition">
+                <span>פרסום מודעה</span>
+                <span>🚀</span>
+            </button>
+        </div>
+    </div>
+
+    <div id="create-ad" class="page p-6 content-buffer">
+        <div class="max-w-md mx-auto">
+            <h2 class="text-3xl font-black text-gray-800 mb-6 italic text-center">פרסום מודעה</h2>
+            <form id="ad-form" onsubmit="handleAdSubmission(event)" class="space-y-4">
+                <div id="upload-container" class="relative w-full h-48 border-2 border-dashed border-gray-200 rounded-3xl overflow-hidden bg-white flex items-center justify-center">
+                    <input type="file" id="file-input" class="absolute inset-0 opacity-0 z-10" accept="image/*" onchange="handleImageUpload(this)" />
+                    <div id="upload-placeholder" class="text-center"><span class="text-4xl">📸</span><p class="text-[10px] text-gray-400 font-bold mt-2 italic">הוסף תמונה</p></div>
+                    <img id="image-display" class="hidden absolute inset-0 w-full h-full object-cover" />
+                </div>
+                <input type="text" id="biz-name" placeholder="שם העסק" class="w-full p-4 rounded-2xl border border-gray-100 outline-none bg-white shadow-sm" required>
+                <textarea id="biz-desc" placeholder="תיאור קצר..." class="w-full p-4 rounded-2xl border border-gray-100 outline-none bg-white shadow-sm" rows="2" required></textarea>
+                <select id="biz-category" class="w-full p-4 rounded-2xl border border-gray-100 bg-white font-bold italic text-gray-700 shadow-sm"></select>
+                <input type="tel" id="biz-phone" placeholder="טלפון לוואטסאפ" class="w-full p-4 rounded-2xl border border-gray-100 bg-white shadow-sm" required>
+                <input type="text" id="biz-address" placeholder="כתובת מדויקת (לניווט)" class="w-full p-4 rounded-2xl border border-gray-100 bg-white shadow-sm outline-none" required>
+
+                <div class="pt-4 mb-[150px]">
+                    <button type="submit" id="submit-btn-text" class="w-full bg-green-700 text-white font-black py-5 rounded-3xl shadow-xl uppercase">המשך לאישור ✅</button>
+                    <button type="button" onclick="showPage('home')" class="w-full py-3 text-gray-400 text-xs font-bold underline">ביטול</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div id="payment" class="page p-6 text-center content-buffer">
+        <div class="bg-white rounded-[40px] p-10 shadow-sm border border-gray-100 mt-10">
+            <h2 class="text-2xl font-black mb-8 italic text-green-700">אישור תשלום</h2>
+            <div class="text-7xl font-black mb-10 text-gray-800">₪20</div>
+            <button onclick="finishAdPublishing()" class="w-full bg-blue-500 text-white py-5 rounded-2xl font-black shadow-xl text-xl">שלם ב-Bit 🟣</button>
+        </div>
+    </div>
+
+    <div id="stats" class="page p-6 content-buffer">
+        <div id="stats-main-view">
+            <h2 class="text-3xl font-black text-gray-800 italic mb-2">ניהול</h2>
+            <p id="stats-subtitle" class="text-xs font-bold text-gray-400 italic mb-6">המודעות שלי</p>
+            <div id="user-stats-list" class="space-y-4"></div>
+        </div>
+        <div id="stats-detail-view" class="hidden">
+            <button onclick="backToStatsMain()" class="text-green-700 font-bold mb-4">← חזרה</button>
+            <div id="ad-report-content"></div>
+        </div>
+    </div>
+
+    <a href="https://wa.me/972500000000" target="_blank" class="contact-btn fixed bottom-44 left-6 z-[100] bg-green-500 text-white p-4 rounded-full shadow-2xl border-2 border-white">
+        <span class="text-2xl">💬</span>
+    </a>
+
+    <nav class="fixed bottom-0 w-full bg-white/95 backdrop-blur-md border-t border-gray-100 flex justify-around p-5 z-50 shadow-2xl">
+        <button onclick="showPage('home')" class="flex flex-col items-center"><span class="text-2xl mb-1">🏘️</span><span class="text-[10px] font-black italic text-gray-400">הלוח</span></button>
+        <button onclick="showPage('stats')" class="flex flex-col items-center"><span class="text-2xl mb-1">📈</span><span class="text-[10px] font-black italic text-gray-400">ניהול</span></button>
+    </nav>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getFirestore, collection, addDoc, getDocs, query, orderBy, deleteDoc, doc, updateDoc, increment } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyBM0ASI8yqtOURLdl73iqIhd0Aao2AbGZQ",
+            authDomain: "project-8263543829550678206.firebaseapp.com",
+            projectId: "project-8263543829550678206",
+            storageBucket: "project-8263543829550678206.firebasestorage.app",
+            messagingSenderId: "938557645466",
+            appId: "1:938557645466:web:8e0a9a4d4b5c861b387523"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        // משתני מערכת
+        let adsList = [];
+        const categories = ["אוכל מהיר", "אוכל מוכן", "מסעדות", "בתי קפה", "מוצרי סת\"ם", "מוצרי קוסמטיקה", "פאות", "לינה ונופש", "השכרת מיטות וחדרונים", "מכירת דירות ונדל\"ן", "כלי עבודה", "מכולת", "יודאיקה", "תיירות", "בידור"];
+        let currentImage = "";
+        let isAdmin = false;
+
+        // טעינת מודעות מ-Firebase
+        async function loadAds() {
+            const q = query(collection(db, "ads"), orderBy("timestamp", "desc"));
+            const querySnapshot = await getDocs(q);
+            adsList = [];
+            querySnapshot.forEach((doc) => {
+                adsList.push({ id: doc.id, ...doc.data() });
+            });
+            renderAds();
+        }
+
+        window.renderAds = function(filter = 'הכל') {
+            const container = document.getElementById('ads-container');
+            container.innerHTML = "";
+            const filtered = filter === 'הכל' ? adsList : adsList.filter(ad => ad.category === filter);
+            
+            if (filtered.length === 0) {
+                container.innerHTML = '<p class="text-center text-gray-400 italic py-10">אין מודעות כרגע.</p>';
+                return;
+            }
+
+            filtered.forEach(ad => {
+                const cleanPhone = ad.phone.replace(/\D/g, '');
+                container.innerHTML += `
+                    <div class="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden mb-8">
+                        <img src="${ad.image}" class="w-full h-56 object-cover">
+                        <div class="p-6">
+                            <div class="flex justify-between items-start mb-3">
+                                <div><h3 class="font-bold text-2xl text-gray-800">${ad.name}</h3><p class="text-blue-600 text-[11px] font-bold">📍 ${ad.address}</p></div>
+                                <span class="bg-green-50 text-green-700 text-[10px] px-2 py-1 rounded-lg font-bold">${ad.category}</span>
+                            </div>
+                            <p class="text-gray-500 text-sm mb-6 italic">${ad.desc}</p>
+                            <div class="flex gap-2">
+                                <a href="https://wa.me/972${cleanPhone.startsWith('0') ? cleanPhone.substring(1) : cleanPhone}" onclick="trackClick('${ad.id}')" target="_blank" class="flex-[2] bg-green-600 text-white py-4 rounded-2xl font-bold text-center">וואטסאפ 💬</a>
+                                <a href="https://waze.com/ul?q=${encodeURIComponent(ad.address)}" class="flex-1 bg-blue-500 text-white py-4 rounded-2xl font-bold text-center">ניווט 🚗</a>
+                            </div>
+                        </div>
+                    </div>`;
+            });
+        }
+
+        window.finishAdPublishing = async function() {
+            const adData = {
+                name: document.getElementById('biz-name').value,
+                desc: document.getElementById('biz-desc').value,
+                category: document.getElementById('biz-category').value,
+                phone: document.getElementById('biz-phone').value,
+                address: document.getElementById('biz-address').value,
+                image: currentImage || "https://images.unsplash.com/photo-1517248135467-4c7ed9d42339?w=500",
+                views: 0,
+                clicks: 0,
+                timestamp: Date.now()
+            };
+
+            try {
+                await addDoc(collection(db, "ads"), adData);
+                alert("המודעה פורסמה בהצלחה!");
+                loadAds();
+                showPage('home');
+            } catch (e) { alert("שגיאה בפרסום"); }
+        }
+
+        window.trackClick = async function(id) {
+            const adRef = doc(db, "ads", id);
+            await updateDoc(adRef, { clicks: increment(1) });
+        }
+
+        window.deleteAd = async function(id) {
+            if(confirm('למחוק לצמיתות?')) {
+                await deleteDoc(doc(db, "ads", id));
+                loadAds();
+                backToStatsMain();
+                updateStats();
+            }
+        }
+
+        // פונקציות עזר (גלובליות כדי שה-HTML יזהה)
+        window.showPage = (id) => {
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+            document.getElementById(id).classList.add('active');
+            if(id === 'stats') updateStats();
+        };
+
+        window.handleImageUpload = (input) => {
+            const file = input.files[0];
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                currentImage = e.target.result;
+                document.getElementById('image-display').src = currentImage;
+                document.getElementById('image-display').classList.remove('hidden');
+                document.getElementById('upload-placeholder').classList.add('hidden');
+            };
+            reader.readAsDataURL(file);
+        };
+
+        window.filterAds = (cat) => {
+            document.querySelectorAll('.category-btn').forEach(b => b.classList.toggle('active', b.innerText === cat));
+            renderAds(cat);
+        };
+
+        window.updateStats = () => {
+            const list = document.getElementById('user-stats-list');
+            list.innerHTML = adsList.map(ad => `
+                <div onclick="showAdReport('${ad.id}')" class="bg-white p-5 rounded-3xl border border-gray-100 flex justify-between items-center shadow-sm">
+                    <div class="flex items-center gap-4">
+                        <img src="${ad.image}" class="w-12 h-12 rounded-xl object-cover">
+                        <div class="text-right"><p class="font-bold">${ad.name}</p><p class="text-[10px]">${ad.category}</p></div>
+                    </div>
+                    <span class="text-green-600 font-bold text-xs">דוח ←</span>
+                </div>
+            `).join('');
+        };
+
+        window.showAdReport = (id) => {
+            const ad = adsList.find(a => a.id === id);
+            document.getElementById('stats-main-view').classList.add('hidden');
+            document.getElementById('stats-detail-view').classList.remove('hidden');
+            document.getElementById('ad-report-content').innerHTML = `
+                <div class="bg-white rounded-[40px] p-8 shadow-sm text-right">
+                    <h3 class="text-2xl font-black mb-6">${ad.name}</h3>
+                    <div class="grid grid-cols-2 gap-4 mb-8">
+                        <div class="bg-blue-50 p-6 rounded-3xl text-center"><p class="text-blue-600 text-[10px]">חשיפות</p><p class="text-3xl font-black">${ad.views || 0}</p></div>
+                        <div class="bg-green-50 p-6 rounded-3xl text-center"><p class="text-green-600 text-[10px]">קליקים</p><p class="text-3xl font-black">${ad.clicks || 0}</p></div>
+                    </div>
+                    <button onclick="deleteAd('${ad.id}')" class="w-full bg-red-50 text-red-600 py-4 rounded-2xl font-bold">מחק מודעה 🗑️</button>
+                </div>`;
+        };
+
+        window.backToStatsMain = () => {
+            document.getElementById('stats-detail-view').classList.add('hidden');
+            document.getElementById('stats-main-view').classList.remove('hidden');
+        };
+
+        window.checkAdmin = () => {
+            const pass = prompt("סיסמה:");
+            if(pass === "1234") {
+                isAdmin = true;
+                document.getElementById('admin-badge').classList.remove('hidden');
+                document.getElementById('logout-admin-btn').classList.remove('hidden');
+            }
+        };
+
+        window.logoutAdmin = () => {
+            isAdmin = false;
+            document.getElementById('admin-badge').classList.add('hidden');
+            document.getElementById('logout-admin-btn').classList.add('hidden');
+        };
+
+        window.prepareNewAd = () => {
+            document.getElementById('ad-form').reset();
+            document.getElementById('image-display').classList.add('hidden');
+            document.getElementById('upload-placeholder').classList.remove('hidden');
+            currentImage = "";
+            showPage('create-ad');
+        };
+
+        window.handleAdSubmission = (e) => {
+            e.preventDefault();
+            isAdmin ? finishAdPublishing() : showPage('payment');
+        };
+
+        // אתחול קטגוריות
+        const bar = document.getElementById('category-bar');
+        const select = document.getElementById('biz-category');
+        categories.forEach(cat => {
+            const btn = document.createElement('button');
+            btn.className = "category-btn flex-shrink-0 bg-gray-100 text-gray-600 px-4 py-2 rounded-full text-xs font-bold transition";
+            btn.innerText = cat; btn.onclick = () => filterAds(cat);
+            bar.appendChild(btn);
+            const opt = document.createElement('option');
+            opt.value = cat; opt.innerText = cat;
+            select.appendChild(opt);
+        });
+
+        loadAds();
+    </script>
+</body>
+</html>
